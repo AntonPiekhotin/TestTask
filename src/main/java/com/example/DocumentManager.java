@@ -52,14 +52,15 @@ public class DocumentManager {
     public List<Document> search(SearchRequest request) {
         // firstly check if "filter" present, then apply it
         return documents.values().stream()
+                // if filter is not present, returns true and all documents passed filter
                 .filter(document -> isNullOrEmpty(request.getTitlePrefixes())
                         || request.getTitlePrefixes().stream().anyMatch(document.getTitle()::startsWith))
                 .filter(document -> isNullOrEmpty(request.getContainsContents())
                         || request.getContainsContents().stream().anyMatch(document.getContent()::contains))
                 .filter(document -> isNullOrEmpty(request.getAuthorIds())
                         || request.getAuthorIds().stream().anyMatch(document.getAuthor().getId()::equals))
-                .filter(document -> request.getCreatedFrom() == null || !document.getCreated().isBefore(request.getCreatedFrom()))
-                .filter(document -> request.getCreatedTo() == null || !document.getCreated().isAfter(request.getCreatedTo()))
+                .filter(document -> request.getCreatedFrom() == null || document.getCreated().isAfter(request.getCreatedFrom()))
+                .filter(document -> request.getCreatedTo() == null || document.getCreated().isBefore(request.getCreatedTo()))
                 .toList();
     }
 
